@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple Projects App</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body{
+            background:#f4f4f4;
+            font-family: system-ui;
+        }
+        .layout{
+            display:flex;
+            height: 100vh;
+        }
+
+        /* LEFT SIDEBAR */
+        .sidebar{
+            width:260px;
+            background:#222;
+            color:#fff;
+            padding:20px;
+        }
+        .sidebar h4{
+            font-size:1.1rem;
+            margin-bottom:15px;
+        }
+        .project-item{
+            padding:10px;
+            background:#333;
+            border-radius:5px;
+            margin-bottom:8px;
+            cursor:pointer;
+        }
+        .project-item:hover{
+            background:#444;
+        }
+        .project-item.active{
+            background:#0d6efd;
+        }
+
+        /* MAIN CONTENT */
+        .main{
+            flex:1;
+            padding:30px;
+            overflow-y:auto;
+        }
+        .card-box{
+            background:#fff;
+            padding:20px;
+            border-radius:8px;
+            box-shadow:0 2px 5px rgba(0,0,0,0.1);
+            max-width:800px;
+        }
+
+        .task-row{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            padding:6px 0;
+            border-bottom:1px solid #eee;
+            font-size:0.9rem;
+        }
+        .task-row:last-child{
+            border-bottom:none;
+        }
+        .task-left{
+            display:flex;
+            flex-direction:column;
+        }
+        .task-title{
+            font-weight:500;
+        }
+        .task-title.done{
+            text-decoration: line-through;
+            color:#777;
+        }
+        .task-meta{
+            font-size:0.75rem;
+            color:#888;
+        }
+
+        .task-actions{
+            display:flex;
+            align-items:center;
+            gap:8px;
+        }
+
+        /* STATUS BADGES (3 վիճակ) */
+        .status-badge{
+            padding:2px 8px;
+            border-radius:999px;
+            font-size:0.75rem;
+            border:1px solid transparent;
+        }
+        .status-pending{
+            background:#f8f9fa;
+            border-color:#dee2e6;
+            color:#555;
+        }
+        .status-inprogress{
+            background:#e7f1ff;
+            border-color:#b6d4fe;
+            color:#0d6efd;
+        }
+        .status-complete{
+            background:#d1f7e2;
+            border-color:#6fd6a8;
+            color:#198754;
+        }
+
+        .task-row button{
+            padding:0;
+            font-size:0.8rem;
+        }
+
+        .summary-bar{
+            font-size:0.85rem;
+            color:#666;
+            margin-bottom:8px;
+        }
+
+        .text-muted-small{
+            font-size:0.8rem;
+        }
+
+        .d-none{display:none!important;}
+    </style>
+</head>
+<body>
+
+<div class="layout">
+
+    <!-- LEFT SIDEBAR -->
+    <div class="sidebar">
+        <h4>Projects</h4>
+
+        <button class="btn btn-sm btn-light w-100 mb-3" id="btnShowProjectForm">+ Add Project</button>
+
+        <div id="projectList">
+            <!-- JS-ով է լցվելու -->
+        </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+
+        <!-- NEW PROJECT FORM -->
+        <div class="card-box mb-3 d-none" id="projectFormCard">
+            <h5 class="mb-3">New Project</h5>
+
+            <div id="projectError" class="text-danger small mb-2 d-none">
+                Please fill required fields.
+            </div>
+
+            <div class="mb-2">
+                <label class="form-label">Title *</label>
+                <input type="text" id="projectTitleInput" class="form-control" placeholder="Project title">
+            </div>
+            <div class="mb-2">
+                <label class="form-label">Due Date</label>
+                <input type="text" id="projectDueInput" class="form-control" placeholder="e.g. 20.11.2025">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Description</label>
+                <textarea id="projectDescInput" class="form-control" rows="2" placeholder="Short description"></textarea>
+            </div>
+
+            <div class="text-end">
+                <button class="btn btn-light btn-sm me-2" id="btnCancelProject">Cancel</button>
+                <button class="btn btn-primary btn-sm" id="btnSaveProject">Save Project</button>
+            </div>
+        </div>
+
+        <!-- PROJECT DETAILS -->
+        <div class="card-box" id="projectDetails">
+
+            <h3 id="pTitle">No project selected</h3>
+            <p class="text-muted text-muted-small" id="pDate">Due: -</p>
+            <p id="pDesc">Select or create a project from the left.</p>
+
+            <hr>
+
+            <h5>Tasks</h5>
+
+            <!-- Քանի թասկ կա / քանիսն է complete -->
+            <div class="summary-bar d-flex justify-content-between">
+                <span>Total tasks: <strong id="taskTotal">0</strong></span>
+                <span>Completed: <strong id="taskCompleted">0</strong></span>
+            </div>
+
+            <!-- New task input + STATUS SELECT -->
+            <div class="row g-2 mb-3">
+                <div class="col-md-7">
+                    <input type="text" id="taskInput" class="form-control" placeholder="Task title">
+                </div>
+                <div class="col-md-3">
+                    <select id="taskStatus" class="form-select">
+                        <option value="pending">Pending</option>
+                        <option value="in_progress">In Progress</option>
+                        <option value="complete">Complete</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-grid">
+                    <button class="btn btn-outline-secondary" id="btnAddTask">Add</button>
+                </div>
+            </div>
+
+            <!-- TASK LIST -->
+            <div id="taskList"></div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
